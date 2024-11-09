@@ -1,19 +1,18 @@
-import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
+import { useFonts } from 'expo-font'
 
-export default function HomeScreen() {
+export default function ProfileScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}></View>
 
       <View style={styles.card}>
         <Text style={styles.cardTopText}>Challenge of the day</Text>
-
         <Text style={styles.cardBottomText}>Compliment a stranger!</Text>
       </View>
 
       <View style={styles.content}>
-        <Text>Home page content</Text>
+        <Text>Profile page content</Text>
       </View>
     </View>
   )
