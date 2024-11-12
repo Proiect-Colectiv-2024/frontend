@@ -6,8 +6,11 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       <View style={styles.blueContainer}>
         <View>
-          <Image source={require('../../assets/images/profilePic.png')} />
-          <Text style={styles.cardTopText}>
+
+          <Text style={styles.usernameText}>
+            <Image
+                style={styles.profilePic}
+                source={require('../../assets/images/profilePic.png')} />
             Username
           </Text>
         </View>
@@ -55,15 +58,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#00008B',
     borderRadius: 10,
     fontSize: 16,
+    fontFamily: 'Sora',
     fontWeight: '300',
     textAlign: 'center',
-    marginBottom: 15,
   },
   cardBottomText: {
     color: 'white',
     fontSize: 32,
     fontFamily: 'Sora',
-    fontWeight: 'semibold',
+    fontWeight: '700',
     textAlign: 'left',
   },
   content: {
@@ -72,4 +75,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: 20,
   },
+  usernameText: {
+    color: 'white',
+    fontSize: 27,
+    fontFamily: 'Sora',
+    padding: 10
+  },
+  profilePic: {
+    height: 48,
+    width:48,
+    padding: 10
+  }
 })
