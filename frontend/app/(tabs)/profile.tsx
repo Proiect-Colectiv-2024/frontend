@@ -1,10 +1,17 @@
-import { View, Text, StyleSheet } from 'react-native'
+import {View, Text, StyleSheet, Image} from 'react-native'
 import { useFonts } from 'expo-font'
 
 export default function ProfileScreen() {
   return (
     <View style={styles.container}>
-      <View style={styles.blueContainer}></View>
+      <View style={styles.blueContainer}>
+        <View>
+          <Image source={require('../../assets/images/profilePic.png')} />
+          <Text style={styles.cardTopText}>
+            Username
+          </Text>
+        </View>
+      </View>
 
       <View style={styles.card}>
         <Text style={styles.cardTopText}>Challenge of the day</Text>
