@@ -1,6 +1,7 @@
 import {View, Text, StyleSheet, Image} from 'react-native'
 import { useFonts } from 'expo-font'
-import { BarChart } from "react-native-chart-kit";
+import React from "react";
+
 
 export default function ProfileScreen() {
   return (
@@ -23,6 +24,22 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.content}>
+        <View style={styles.statusContainer}>
+          <View style={styles.smallCard}>
+            <Image source={require('../../assets/images/check_box.png')} style={styles.icon} />
+            <View>
+              <Text style={styles.completedText}>Completed</Text>
+              <Text style={styles.completedNumber}>348</Text>
+            </View>
+          </View>
+          <View style={styles.smallCard}>
+            <Image source={require('../../assets/images/missedIcon.png')} style={styles.icon} />
+            <View>
+              <Text style={styles.completedText}>Missed</Text>
+              <Text style={styles.completedNumber}>50</Text>
+            </View>
+          </View>
+        </View>
 
       </View>
     </View>
@@ -72,9 +89,9 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    justifyContent: 'center',
+    justifyContent: 'flex-start',
     alignItems: 'center',
-    padding: 20,
+    padding: 100,
   },
   usernameText: {
     color: 'white',
@@ -86,5 +103,47 @@ const styles = StyleSheet.create({
     height: 48,
     width:48,
     padding: 10
+  },
+  icon: {
+    width: 24,
+    height: 24,
+  },
+  smallCard: {
+    display: 'flex',
+    width: 140,
+    padding: 6,
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 6,
+    flexShrink: 0,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#ffffff',
+    backgroundColor: '#00008B',
+  },
+  completedText: {
+    color: '#FFF',
+    fontFamily: 'Sora',
+    fontSize: 10,
+    fontStyle: 'normal',
+    fontWeight: '600',
+  },
+  completedNumber: {
+    color: '#FFF',
+    fontFamily: 'Sora',
+    fontSize: 14,
+    fontStyle: 'normal',
+    fontWeight: '700',
+  },
+  statusContainer: {
+    display: 'flex',
+    width: 289,
+    height: 43,
+    justifyContent: 'center',
+    alignItems: 'flex-start',
+    alignContent: 'flex-start',
+    gap: 8.5,
+    flexShrink: 0,
+    flexWrap: 'wrap',
   }
 })
