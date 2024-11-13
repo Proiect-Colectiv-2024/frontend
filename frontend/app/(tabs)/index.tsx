@@ -257,7 +257,6 @@ const styles = StyleSheet.create({
     fontWeight: '300',
     fontFamily: 'Sora',
     textAlign: 'center',
-    marginBottom: 15,
   },
   cardBottomText: {
     color: 'white',
