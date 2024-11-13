@@ -1,5 +1,6 @@
 import {View, Text, StyleSheet, Image} from 'react-native'
 import { useFonts } from 'expo-font'
+import { BarChart } from "react-native-chart-kit";
 
 export default function ProfileScreen() {
   return (
@@ -22,7 +23,7 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text>Profile page content</Text>
+
       </View>
     </View>
   )
