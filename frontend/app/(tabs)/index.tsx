@@ -318,14 +318,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     fontSize: 16,
     fontWeight: '300',
+    fontFamily: 'Sora',
     textAlign: 'center',
-    marginBottom: 15,
   },
   cardBottomText: {
     color: 'white',
     fontSize: 32,
     fontFamily: 'Sora',
-    fontWeight: 'semibold',
+    fontWeight: '700',
     textAlign: 'left',
   },
   content: {

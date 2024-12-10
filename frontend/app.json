@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "frontend",
-    "slug": "raok",
+    "slug": "frontend",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -34,9 +34,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "be81319b-8608-4fd2-bb9e-49157b0aff9c"
+        "projectId": "2ae2bea2-64e7-4966-b457-98b9de5ecbd5"
       }
     },
-    "owner": "iuliaamol"
+    "owner": "dywane12"
   }
 }
