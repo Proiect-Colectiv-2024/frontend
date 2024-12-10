@@ -6,6 +6,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   ScrollView,
+  Modal,
 } from 'react-native'
 
 interface IChallenge {
@@ -120,6 +121,11 @@ export default function HomeScreen() {
     'history' | 'daily' | 'weekly'
   >('history')
 
+  const [modalVisible, setModalVisible] = useState(false)
+  const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
+    null
+  )
+
   const filteredChallenges = challenges.filter((challenge) => {
     if (selectedType === 'history') {
       return challenge.status === 'completed' || challenge.status === 'missed'
@@ -131,25 +137,38 @@ export default function HomeScreen() {
     return false
   })
 
-  const renderChallengeCard = ({ item }: { item: IChallenge }) => (
-    <View style={styles.card}>
-      <View style={styles.cardContent}>
-        <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.status}>
-          {item.status.charAt(0).toUpperCase() + item.status.slice(1)} challenge
-        </Text>
-      </View>
+  const openModal = (challenge: IChallenge) => {
+    setSelectedChallenge(challenge)
+    setModalVisible(true)
+  }
 
-      {/* Icon on the right side based on challenge status */}
-      <View style={styles.iconContainer}>
-        {item.status === 'completed' && (
-          <Ionicons name='checkmark-circle' size={30} color='green' />
-        )}
-        {item.status === 'missed' && (
-          <Ionicons name='close-circle' size={30} color='red' />
-        )}
+  const closeModal = () => {
+    setModalVisible(false)
+    setSelectedChallenge(null)
+  }
+
+  const renderChallengeCard = ({ item }: { item: IChallenge }) => (
+    <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
+      <View style={styles.card}>
+        <View style={styles.cardContent}>
+          <Text style={styles.description}>{item.description}</Text>
+          <Text style={styles.status}>
+            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}{' '}
+            challenge
+          </Text>
+        </View>
+
+        {/* Icon on the right side based on challenge status */}
+        <View style={styles.iconContainer}>
+          {item.status === 'completed' && (
+            <Ionicons name='checkmark-circle' size={30} color='green' />
+          )}
+          {item.status === 'missed' && (
+            <Ionicons name='close-circle' size={30} color='red' />
+          )}
+        </View>
       </View>
-    </View>
+    </TouchableOpacity>
   )
 
   return (
@@ -220,6 +239,50 @@ export default function HomeScreen() {
           {filteredChallenges.map((item) => renderChallengeCard({ item }))}
         </ScrollView>
       </View>
+      {/* Modal for challenge description */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType='none'
+        onRequestClose={closeModal}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            {/* Close Icon */}
+            <TouchableOpacity
+              style={styles.closeIconContainer}
+              onPress={closeModal}
+            >
+              <Ionicons name='close' size={15} color='black' />
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>
+              {selectedChallenge?.description}
+            </Text>
+
+            {selectedChallenge?.status === 'completed' ||
+            selectedChallenge?.status === 'missed' ? (
+              <Text style={styles.modalDescription}>
+                You {selectedChallenge.status} this challenge.
+              </Text>
+            ) : (
+              <View style={styles.buttonsRow}>
+                <TouchableOpacity
+                  style={styles.completedButton}
+                  onPress={closeModal}
+                >
+                  <Text style={styles.completedButtonText}>Completed</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={styles.missedButton}
+                  onPress={closeModal}
+                >
+                  <Text style={styles.missedButtonText}>Missed</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   )
 }
@@ -302,10 +365,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     borderRadius: 10,
     marginVertical: 5,
-    padding: 25,
+    padding: 10,
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
   },
   cardContent: {
     flex: 1,
@@ -313,13 +376,71 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 18,
     fontWeight: 'bold',
+    flexWrap: 'wrap',
   },
   status: {
     fontSize: 14,
     color: '#999',
   },
   iconContainer: {
+    marginLeft: 10, // Adds space between the text and the icon
+    justifyContent: 'center',
+    alignItems: 'flex-end', // Aligns the icon to the right
+  },
+  modalContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Semi-transparent background
+  },
+  modalContent: {
+    width: '80%',
+    backgroundColor: '#fff',
+    borderRadius: 10,
+    padding: 20,
+    position: 'relative', // Required for positioning the "X" icon
+  },
+  closeIconContainer: {
+    position: 'absolute',
+    top: 5,
+    right: 5,
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  modalDescription: {
+    fontSize: 16,
+    marginBottom: 20,
+  },
+  buttonsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 20,
+  },
+  completedButton: {
+    backgroundColor: '#F7A348',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    flex: 0.45,
+  },
+  completedButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  missedButton: {
+    backgroundColor: '#00008B',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+    flex: 0.45,
+  },
+  missedButtonText: {
+    color: '#FFF',
+    fontWeight: 'bold',
+    fontSize: 16,
   },
 })
