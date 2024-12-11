@@ -18,36 +18,86 @@ interface IChallenge {
   type: string;
   description: string;
 }
+
+interface IUserObject {
+  id: number;
+  username: string;
+  email: string;
+  picture: string;
+  level: number;
+  completedChallenges: IChallenge[];
+  missedChallenges: IChallenge[];
+  inProgressChallenges: IChallenge[];
+}
+
 export default function HomeScreen() {
   const { user } = useContext(AuthContext)!;
-  console.log(user);
-  const [challenges, setChallenges] = useState<IChallenge[]>([]);
+  const [userObject, setUserObject] = useState<IUserObject>({
+    id: 0,
+    username: '',
+    email: '',
+    picture: '',
+    level: 0,
+    completedChallenges: [],
+    missedChallenges: [],
+    inProgressChallenges: [],
+  });
+  const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
+      null
+  )
 
+  console.log(user);
   useEffect(() => {
-    axios.get(' http://localhost:8080/challenges').then((response) => {
-      setChallenges(response.data);
+    axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
+      setUserObject(response.data);
       console.log(response.data)
     })
   }, []);
-  const [selectedType, setSelectedType] = useState<
-    'history' | 'daily' | 'weekly'
-  >('history')
+  useEffect(() => {
+    axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
+      setUserObject(response.data);
+      console.log(response.data)
+    })
+  }, [selectedChallenge]);
+
+  const [history, setHistory] = useState(true);
+  const [daily, setDaily] = useState(false);
+  const [weekly, setWeekly] = useState(false);
 
   const [modalVisible, setModalVisible] = useState(false)
-  const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
-    null
-  )
 
-  const filteredChallenges = challenges.filter((challenge) => {
-    if (selectedType === 'history') {
-      return challenge.status === 'completed' || challenge.status === 'missed'
-    } else if (selectedType === 'daily') {
-      return challenge.status === 'in progress' && challenge.type === 'daily'
-    } else if (selectedType === 'weekly') {
-      return challenge.status === 'in progress' && challenge.type === 'weekly'
+
+  const handleCompleted = async () => {
+    if (selectedChallenge) {
+      try {
+        // Send the POST request for completing the challenge
+        await axios.post(
+            `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/complete`
+        );
+        console.log('Challenge marked as completed');
+        // Optionally, handle state updates or UI changes here
+      } catch (error) {
+        console.error('Error completing challenge:', error);
+        // You can show an error message to the user here
+      }
     }
-    return false
-  })
+  };
+
+  const handleMissed = async () => {
+    if (selectedChallenge) {
+      try {
+        // Send the POST request for marking the challenge as missed
+        await axios.post(
+            `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/miss`
+        );
+        console.log('Challenge marked as missed');
+        // Optionally, handle state updates or UI changes here
+      } catch (error) {
+        console.error('Error marking challenge as missed:', error);
+        // You can show an error message to the user here
+      }
+    }
+  };
 
   const openModal = (challenge: IChallenge) => {
     setSelectedChallenge(challenge)
@@ -96,14 +146,18 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[
               styles.button,
-              selectedType === 'history' && styles.selectedButton,
+              history && styles.selectedButton,
             ]}
-            onPress={() => setSelectedType('history')}
+            onPress={() => {
+              setHistory(true)
+              setDaily(false)
+              setWeekly(false)
+            }}
           >
             <Text
               style={[
                 styles.buttonText,
-                selectedType === 'history' && styles.selectedButtonText,
+                history && styles.selectedButtonText,
               ]}
             >
               History
@@ -113,14 +167,18 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[
               styles.button,
-              selectedType === 'daily' && styles.selectedButton,
+              daily && styles.selectedButton,
             ]}
-            onPress={() => setSelectedType('daily')}
+            onPress={() => {
+              setHistory(false)
+              setDaily(true)
+              setWeekly(false)
+            }}
           >
             <Text
               style={[
                 styles.buttonText,
-                selectedType === 'daily' && styles.selectedButtonText,
+                daily && styles.selectedButtonText,
               ]}
             >
               Daily
@@ -130,14 +188,18 @@ export default function HomeScreen() {
           <TouchableOpacity
             style={[
               styles.button,
-              selectedType === 'weekly' && styles.selectedButton,
+              weekly && styles.selectedButton,
             ]}
-            onPress={() => setSelectedType('weekly')}
+            onPress={() => {
+              setHistory(false)
+              setDaily(false)
+              setWeekly(true)
+            }}
           >
             <Text
               style={[
                 styles.buttonText,
-                selectedType === 'weekly' && styles.selectedButtonText,
+                weekly && styles.selectedButtonText,
               ]}
             >
               Weekly
@@ -146,9 +208,46 @@ export default function HomeScreen() {
         </View>
 
         {/* List of Challenge Cards */}
-        <ScrollView style={styles.challengeList}>
-          {filteredChallenges.map((item) => renderChallengeCard({ item }))}
-        </ScrollView>
+        {history ? (
+            <ScrollView style={styles.challengeList}>
+              {userObject.completedChallenges?.length > 0 ? (
+                  userObject.completedChallenges.map((item) =>
+                      renderChallengeCard({ item })
+                  )
+              ) : (
+                  <Text>No completed or missed challenges found.</Text>
+              )}
+              {userObject.missedChallenges?.length > 0 ? (
+                  userObject.missedChallenges.map((item) =>
+                      renderChallengeCard({ item })
+                  )
+              ) : <Text>No completed or missed challenges</Text>}
+            </ScrollView>
+        ) : null}
+        {daily ? (
+            <ScrollView style={styles.challengeList}>
+              {userObject.inProgressChallenges.filter(challenge => challenge.type === 'daily').length > 0 ? (
+                  userObject.inProgressChallenges
+                      .filter(challenge => challenge.type === 'daily')
+                      .map(item => renderChallengeCard({ item }))
+              ) : (
+                  <Text>No daily in-progress challenges found.</Text>
+              )}
+            </ScrollView>
+        ) : null}
+
+        {weekly ? (
+            <ScrollView style={styles.challengeList}>
+              {userObject.inProgressChallenges.filter(challenge => challenge.type === 'weekly').length > 0 ? (
+                  userObject.inProgressChallenges
+                      .filter(challenge => challenge.type === 'weekly')
+                      .map(item => renderChallengeCard({ item }))
+              ) : (
+                  <Text>No weekly in-progress challenges found.</Text>
+              )}
+            </ScrollView>
+        ) : null}
+
       </View>
       {/* Modal for challenge description */}
       <Modal
@@ -179,13 +278,13 @@ export default function HomeScreen() {
               <View style={styles.buttonsRow}>
                 <TouchableOpacity
                   style={styles.completedButton}
-                  onPress={closeModal}
+                  onPress={handleCompleted}
                 >
                   <Text style={styles.completedButtonText}>Completed</Text>
                 </TouchableOpacity>
                 <TouchableOpacity
                   style={styles.missedButton}
-                  onPress={closeModal}
+                  onPress={handleMissed}
                 >
                   <Text style={styles.missedButtonText}>Missed</Text>
                 </TouchableOpacity>
