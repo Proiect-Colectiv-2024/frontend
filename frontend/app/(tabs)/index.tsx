@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import {
   View,
@@ -10,6 +10,7 @@ import {
 } from 'react-native'
 import axios from 'axios'
 import {useLocalSearchParams} from "expo-router";
+import {AuthContext} from "@/app/AuthProvider";
 
 interface IChallenge {
   id: number;
@@ -18,8 +19,8 @@ interface IChallenge {
   description: string;
 }
 export default function HomeScreen() {
-  const  username  = useLocalSearchParams();
-  console.log(username);
+  const { user } = useContext(AuthContext)!;
+  console.log(user);
   const [challenges, setChallenges] = useState<IChallenge[]>([]);
 
   useEffect(() => {

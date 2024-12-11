@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
+import React, {useContext, useState} from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import axios from "axios";
+import { AuthContext } from '@/app/AuthProvider';
 
-const LoginPage: React.FC = () => {
+const LoginPage = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
+    const { setUser } = useContext(AuthContext)!;
     const router = useRouter();
 
     const handleLogin = () => {
         axios.get(`http://localhost:8080/users/username/${username}`).then((response)=>{
+            setUser(username);
             router.replace({
-                pathname: '/',
-                params: { username }, // Pass username as a query parameter
+                pathname: '/'
             });
         }).catch(() => {
             console.log("Error! Couldn't find user.")

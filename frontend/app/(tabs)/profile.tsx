@@ -1,13 +1,15 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { useFonts } from "expo-font";
-import React, { Component } from "react";
+import React, {Component, useContext} from "react";
 import SemiCircleProgress from "../../components/ProgressChart";
 import { BarChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { ScrollView } from "react-native-gesture-handler";
+import {AuthContext} from "@/app/AuthProvider";
 
 const ProfileScreen = () => {
+  const { user } = useContext(AuthContext)!;
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}>
@@ -17,7 +19,7 @@ const ProfileScreen = () => {
               style={styles.profilePic}
               source={require("../../assets/images/profilePic.png")}
             />
-            Username
+            {user}
           </Text>
         </View>
       </View>
