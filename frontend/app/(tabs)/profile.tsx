@@ -1,15 +1,39 @@
 import { View, Text, StyleSheet, Image } from "react-native";
 import { useFonts } from "expo-font";
-import React, {Component, useContext} from "react";
+import React, {Component, useContext, useEffect, useState} from "react";
 import SemiCircleProgress from "../../components/ProgressChart";
 import { BarChart } from "react-native-chart-kit";
 import { Dimensions } from "react-native";
 import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { ScrollView } from "react-native-gesture-handler";
 import {AuthContext} from "@/app/AuthProvider";
+import axios from "axios";
 
 const ProfileScreen = () => {
   const { user } = useContext(AuthContext)!;
+  const [userObject, setUserObject] = useState(null);
+  const [completedCount, setCompletedCount] = useState(0);
+  const [missedCount, setMissedCount] = useState(0);
+  const [completionRatio, setCompletionRatio] = useState(0);
+
+  useEffect(() => {
+    axios.get(`http://localhost:8080/users/username/${user}`)
+        .then((response) => {
+          const userData = response.data;
+          setUserObject(userData);
+
+          const completed = userData.completedChallenges.length;
+          const missed = userData.missedChallenges.length;
+
+          setCompletedCount(completed);
+          setMissedCount(missed);
+          setCompletionRatio(missed === 0 ? 100 : (completed / (completed + missed)) * 100);
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+        });
+  }, [user]);
+
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}>
@@ -38,7 +62,7 @@ const ProfileScreen = () => {
             />
             <View>
               <Text style={styles.completedText}>Completed</Text>
-              <Text style={styles.completedNumber}>348</Text>
+              <Text style={styles.completedNumber}>{completedCount}</Text>
             </View>
           </View>
           <View style={styles.smallCard}>
@@ -48,14 +72,14 @@ const ProfileScreen = () => {
             />
             <View>
               <Text style={styles.completedText}>Missed</Text>
-              <Text style={styles.completedNumber}>50</Text>
+              <Text style={styles.completedNumber}>{missedCount}</Text>
             </View>
           </View>
         </View>
       </View>
       <ScrollView style={styles.scrollView}>
         <View style={styles.percentage}>
-          <SemiCircleProgress percentage={50} />
+          <SemiCircleProgress percentage={Math.round(completionRatio)} />
         </View>
         <View style={styles.barChart}>
           <Text style={styles.barChartTitle}>Last 4 months</Text>
