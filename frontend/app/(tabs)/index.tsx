@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, {useEffect, useState} from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import {
   View,
@@ -8,115 +8,24 @@ import {
   ScrollView,
   Modal,
 } from 'react-native'
+import axios from 'axios'
 
 interface IChallenge {
-  id: string
-  description: string
-  status: 'completed' | 'in progress' | 'missed'
-  type: 'daily' | 'weekly'
+  id: number;
+  status: string;
+  type: string;
+  description: string;
 }
-
-const challenges: IChallenge[] = [
-  {
-    id: '1',
-    description: 'Meditate for 10 minutes',
-    status: 'completed',
-    type: 'daily',
-  },
-  {
-    id: '2',
-    description: 'Read a chapter of a book',
-    status: 'in progress',
-    type: 'daily',
-  },
-  {
-    id: '3',
-    description: 'Exercise for 30 minutes',
-    status: 'missed',
-    type: 'weekly',
-  },
-  {
-    id: '4',
-    description: 'Exercise for 30 minutes',
-    status: 'in progress',
-    type: 'weekly',
-  },
-  {
-    id: '5',
-    description: 'Exercise for 30 minutes',
-    status: 'in progress',
-    type: 'daily',
-  },
-  // Additional Challenges
-  {
-    id: '6',
-    description: 'Drink 8 glasses of water',
-    status: 'completed',
-    type: 'daily',
-  },
-  {
-    id: '7',
-    description: 'Walk 10,000 steps',
-    status: 'in progress',
-    type: 'daily',
-  },
-  {
-    id: '8',
-    description: 'Plan next week’s tasks',
-    status: 'missed',
-    type: 'weekly',
-  },
-  {
-    id: '9',
-    description: 'Write a gratitude journal entry',
-    status: 'in progress',
-    type: 'daily',
-  },
-  {
-    id: '10',
-    description: 'Call a friend or family member',
-    status: 'in progress',
-    type: 'weekly',
-  },
-  {
-    id: '11',
-    description: 'Do 10 push-ups',
-    status: 'completed',
-    type: 'daily',
-  },
-  {
-    id: '12',
-    description: 'Prepare a healthy meal',
-    status: 'in progress',
-    type: 'weekly',
-  },
-  {
-    id: '13',
-    description: 'Read a personal development article',
-    status: 'missed',
-    type: 'daily',
-  },
-  {
-    id: '14',
-    description: 'Organize your workspace',
-    status: 'in progress',
-    type: 'weekly',
-  },
-  {
-    id: '15',
-    description: 'Journal for 10 minutes',
-    status: 'completed',
-    type: 'daily',
-  },
-  {
-    id: '16',
-    description: 'Run for 20 minutes',
-    status: 'in progress',
-    type: 'weekly',
-  },
-]
-
 export default function HomeScreen() {
+
+  const [challenges, setChallenges] = useState<IChallenge[]>([]);
+
+  useEffect(() => {
+    axios.get(' http://localhost:8080/challenges').then((response) => {
+      setChallenges(response.data);
+      console.log(response.data)
+    })
+  }, []);
   const [selectedType, setSelectedType] = useState<
     'history' | 'daily' | 'weekly'
   >('history')
@@ -148,24 +57,23 @@ export default function HomeScreen() {
   }
 
   const renderChallengeCard = ({ item }: { item: IChallenge }) => (
-    <TouchableOpacity style={styles.card} onPress={() => openModal(item)}>
+    <TouchableOpacity style={styles.card} onPress={() => openModal(item)} key={item.id}>
       <View style={styles.card}>
         <View style={styles.cardContent}>
-          <Text style={styles.description}>{item.description}</Text>
-          <Text style={styles.status}>
-            {item.status.charAt(0).toUpperCase() + item.status.slice(1)}{' '}
-            challenge
+          <Text style={styles.description}>
+            {item.description}
+            <View style={styles.iconContainer}>
+              {item.status === 'completed' && (
+                  <Ionicons name='checkmark-circle' size={30} color='green' />
+              )}
+              {item.status === 'missed' && (
+                  <Ionicons name='close-circle' size={30} color='red' />
+              )}
+            </View>
           </Text>
-        </View>
-
-        {/* Icon on the right side based on challenge status */}
-        <View style={styles.iconContainer}>
-          {item.status === 'completed' && (
-            <Ionicons name='checkmark-circle' size={30} color='green' />
-          )}
-          {item.status === 'missed' && (
-            <Ionicons name='close-circle' size={30} color='red' />
-          )}
+          <Text style={styles.status}>
+            Challenge {item.status}
+          </Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -366,9 +274,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: 5,
     padding: 10,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    alignItems: 'flex-start',
   },
   cardContent: {
     flex: 1,
@@ -381,11 +287,11 @@ const styles = StyleSheet.create({
   status: {
     fontSize: 14,
     color: '#999',
+    top: 5
   },
   iconContainer: {
-    marginLeft: 10, // Adds space between the text and the icon
-    justifyContent: 'center',
-    alignItems: 'flex-end', // Aligns the icon to the right
+    marginLeft: 10,
+    top: 10, // Adds space between the text and the icon
   },
   modalContainer: {
     flex: 1,

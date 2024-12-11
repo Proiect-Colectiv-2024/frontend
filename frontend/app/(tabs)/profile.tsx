@@ -7,7 +7,7 @@ import { Dimensions } from "react-native";
 import { opacity } from "react-native-reanimated/lib/typescript/reanimated2/Colors";
 import { ScrollView } from "react-native-gesture-handler";
 
-export default function ProfileScreen() {
+const ProfileScreen = () => {
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}>
@@ -223,7 +223,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "75%",
     height: 200,
-    position: "absolute",
     top: 0,
     left: "12.5%",
     paddingTop: 10,
@@ -239,15 +238,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     width: "75%",
     height: 300,
-    position: "absolute",
-    top: 250,
+    top: 20,
     left: "12.5%",
     paddingTop: 10,
     paddingBottom: 10,
   },
   barChartTitle: {
     color: "white",
-    position: "absolute",
     fontSize: 24,
     fontWeight: "bold",
     top: 10,
@@ -262,3 +259,5 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
 });
+
+export default ProfileScreen
