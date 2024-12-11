@@ -9,6 +9,7 @@ import {
   Modal,
 } from 'react-native'
 import axios from 'axios'
+import {useLocalSearchParams} from "expo-router";
 
 interface IChallenge {
   id: number;
@@ -17,7 +18,8 @@ interface IChallenge {
   description: string;
 }
 export default function HomeScreen() {
-
+  const  username  = useLocalSearchParams();
+  console.log(username);
   const [challenges, setChallenges] = useState<IChallenge[]>([]);
 
   useEffect(() => {
@@ -193,6 +195,7 @@ export default function HomeScreen() {
       </Modal>
     </View>
   )
+
 }
 
 const styles = StyleSheet.create({

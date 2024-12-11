@@ -1,29 +1,22 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import axios from "axios";
 
 const LoginPage: React.FC = () => {
     const [username, setUsername] = useState<string>('');
     const [password, setPassword] = useState<string>('');
     const router = useRouter();
 
-    const handleLogin = async () => {
-        try {
-            const response = await fetch(`http://localhost:8081/users/username/${username}`);
-            const users = await response.json();
-
-            const userExists = users.some((user: { username: string }) => user.username === username);
-
-            if (userExists) {
-                Alert.alert('Login Successful', `Welcome, ${username}!`);
-                router.replace('/'); // Navigate to the tabs group
-            } else {
-                Alert.alert('Login Failed', 'Username not found.');
-            }
-        } catch (error) {
-            console.error('Error fetching users:', error);
-            Alert.alert('Error', 'Unable to process login.');
-        }
+    const handleLogin = () => {
+        axios.get(`http://localhost:8080/users/username/${username}`).then((response)=>{
+            router.replace({
+                pathname: '/',
+                params: { username }, // Pass username as a query parameter
+            });
+        }).catch(() => {
+            console.log("Error! Couldn't find user.")
+        })
     };
 
     return (
