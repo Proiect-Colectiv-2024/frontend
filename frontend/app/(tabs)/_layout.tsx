@@ -23,23 +23,11 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name='groups'
+        name='forum'
         options={{
           tabBarIcon: ({ color, focused }) => (
             <Ionicons
               name={focused ? 'people-sharp' : 'people-outline'}
-              color={color}
-              size={24}
-            />
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name='locations'
-        options={{
-          tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'location-sharp' : 'location-outline'}
               color={color}
               size={24}
             />
