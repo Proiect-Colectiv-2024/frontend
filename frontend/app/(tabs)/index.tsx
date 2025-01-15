@@ -9,7 +9,7 @@ import {
   Modal,
 } from 'react-native'
 import axios from 'axios'
-import {useLocalSearchParams} from "expo-router";
+import {useRouter} from "expo-router";
 import {AuthContext} from "@/app/AuthProvider";
 
 interface IChallenge {
@@ -32,6 +32,7 @@ interface IUserObject {
 
 export default function HomeScreen() {
   const { user } = useContext(AuthContext)!;
+  const router = useRouter();
   const [userObject, setUserObject] = useState<IUserObject>({
     id: 0,
     username: '',
@@ -45,6 +46,13 @@ export default function HomeScreen() {
   const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
       null
   )
+
+  // Redirect to login if the user is not authenticated
+  useEffect(() => {
+    if (!user) {
+      router.replace('http://localhost:8081/login_page'); // Adjust the route if needed
+    }
+  }, [user]);
 
   console.log(user);
   useEffect(() => {
