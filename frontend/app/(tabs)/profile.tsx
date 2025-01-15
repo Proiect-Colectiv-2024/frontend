@@ -32,25 +32,21 @@ const ProfileScreen = () => {
         .catch((error) => {
           console.error("Error fetching user data:", error);
         });
-  }, [user]);
+  }, [userObject]);
 
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}>
         <View>
           <Text style={styles.usernameText}>
-            <Image
-              style={styles.profilePic}
-              source={require("../../assets/images/profilePic.png")}
-            />
             {user}
           </Text>
         </View>
       </View>
 
       <View style={styles.card}>
-        <Text style={styles.cardTopText}>Challenge of the day</Text>
-        <Text style={styles.cardBottomText}>Compliment a stranger!</Text>
+        <Text style={styles.cardTopText}>This is your profile</Text>
+        <Text style={styles.cardBottomText}>Take a look at your stats!</Text>
       </View>
 
       <View style={styles.content}>
@@ -188,8 +184,9 @@ const styles = StyleSheet.create({
   },
   usernameText: {
     color: "white",
-    fontSize: 27,
+    fontSize: 40,
     fontFamily: "Sora",
+    fontWeight: "bold",
     padding: 10,
   },
   profilePic: {

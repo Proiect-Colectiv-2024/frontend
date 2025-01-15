@@ -46,6 +46,7 @@ export default function HomeScreen() {
   const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
       null
   )
+  const [dailyChallenge, setDailyChallenge] = useState<IChallenge | null>(null);
 
   // Redirect to login if the user is not authenticated
   useEffect(() => {
@@ -58,6 +59,16 @@ export default function HomeScreen() {
   useEffect(() => {
     axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
       setUserObject(response.data);
+      const dailyChallenges = response.data.inProgressChallenges.filter(
+          (item) => item.type === 'daily'
+      );
+      if (dailyChallenges.length > 0) {
+        const randomChallenge =
+            dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)];
+        setDailyChallenge(randomChallenge);
+      } else {
+        setDailyChallenge(null); // No daily challenges available
+      }
       console.log(response.data)
     })
   }, []);
@@ -140,14 +151,25 @@ export default function HomeScreen() {
     </TouchableOpacity>
   )
 
+
+
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}></View>
 
       <View style={styles.cardDaily}>
         <Text style={styles.cardTopText}>Challenge of the day</Text>
-        <Text style={styles.cardBottomText}>Compliment a stranger!</Text>
+        <TouchableOpacity
+        onPress={() => openModal(dailyChallenge)}
+        >
+        {dailyChallenge ? (
+            <Text style={styles.cardBottomText}>{dailyChallenge.description}</Text>
+        ) : (
+            <Text style={styles.cardBottomText}>No daily challenges available!</Text>
+        )}
+        </TouchableOpacity>
       </View>
+
 
       <View style={styles.content}>
         <View style={styles.buttons}>
@@ -223,13 +245,13 @@ export default function HomeScreen() {
                       renderChallengeCard({ item })
                   )
               ) : (
-                  <Text>No completed or missed challenges found.</Text>
+                  <Text>No completed challenges found.</Text>
               )}
               {userObject.missedChallenges?.length > 0 ? (
                   userObject.missedChallenges.map((item) =>
                       renderChallengeCard({ item })
                   )
-              ) : <Text>No completed or missed challenges</Text>}
+              ) : <Text>No missed challenges</Text>}
             </ScrollView>
         ) : null}
         {daily ? (
@@ -322,9 +344,9 @@ const styles = StyleSheet.create({
     padding: 30,
     borderRadius: 20,
     width: '80%',
-    height: 140,
+    height: 200,
     position: 'absolute',
-    top: 160,
+    top: 100,
     left: '10%',
     justifyContent: 'space-between',
     paddingTop: 10,
