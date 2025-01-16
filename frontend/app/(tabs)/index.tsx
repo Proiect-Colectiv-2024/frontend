@@ -55,7 +55,7 @@ export default function HomeScreen() {
     }
   }, [user]);
 
-  console.log(user);
+  console.log(user)
   useEffect(() => {
     axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
       setUserObject(response.data);
