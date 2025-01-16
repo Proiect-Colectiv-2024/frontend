@@ -23,6 +23,7 @@ const styles = StyleSheet.create({
   },
   button: {
     fontSize: 20,
+    fontFamily: 'Sora',
     textDecorationLine: 'underline',
   },
 })

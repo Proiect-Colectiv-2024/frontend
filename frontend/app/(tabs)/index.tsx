@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'
 import {
   View,
@@ -9,30 +9,30 @@ import {
   Modal,
 } from 'react-native'
 import axios from 'axios'
-import {useRouter} from "expo-router";
-import {AuthContext} from "@/app/AuthProvider";
+import { useRouter } from 'expo-router'
+import { AuthContext } from '@/app/AuthProvider'
 
 interface IChallenge {
-  id: number;
-  status: string;
-  type: string;
-  description: string;
+  id: number
+  status: string
+  type: string
+  description: string
 }
 
 interface IUserObject {
-  id: number;
-  username: string;
-  email: string;
-  picture: string;
-  level: number;
-  completedChallenges: IChallenge[];
-  missedChallenges: IChallenge[];
-  inProgressChallenges: IChallenge[];
+  id: number
+  username: string
+  email: string
+  picture: string
+  level: number
+  completedChallenges: IChallenge[]
+  missedChallenges: IChallenge[]
+  inProgressChallenges: IChallenge[]
 }
 
 export default function HomeScreen() {
-  const { user } = useContext(AuthContext)!;
-  const router = useRouter();
+  const { user } = useContext(AuthContext)!
+  const router = useRouter()
   const [userObject, setUserObject] = useState<IUserObject>({
     id: 0,
     username: '',
@@ -42,81 +42,89 @@ export default function HomeScreen() {
     completedChallenges: [],
     missedChallenges: [],
     inProgressChallenges: [],
-  });
+  })
   const [selectedChallenge, setSelectedChallenge] = useState<IChallenge | null>(
-      null
+    null
   )
-  const [dailyChallenge, setDailyChallenge] = useState<IChallenge | null>(null);
+  const [dailyChallenge, setDailyChallenge] = useState<IChallenge | null>(null)
+  const [challengeStatus, setChallengeStatus] = useState<
+    'completed' | 'missed' | null
+  >(null)
 
   // Redirect to login if the user is not authenticated
   useEffect(() => {
     if (!user) {
-      router.replace('http://localhost:8081/login'); // Adjust the route if needed
+      router.replace('http://localhost:8081/login') // Adjust the route if needed
     }
-  }, [user]);
+  }, [user])
 
-  console.log(user);
+  console.log(user)
   useEffect(() => {
-    axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
-      setUserObject(response.data);
-      const dailyChallenges = response.data.inProgressChallenges.filter(
+    axios
+      .get(` http://localhost:8080/users/username/${user}`)
+      .then((response) => {
+        setUserObject(response.data)
+        const dailyChallenges = response.data.inProgressChallenges.filter(
           (item) => item.type === 'daily'
-      );
-      if (dailyChallenges.length > 0) {
-        const randomChallenge =
-            dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)];
-        setDailyChallenge(randomChallenge);
-      } else {
-        setDailyChallenge(null); // No daily challenges available
-      }
-      console.log(response.data)
-    })
-  }, []);
+        )
+        if (dailyChallenges.length > 0) {
+          const randomChallenge =
+            dailyChallenges[Math.floor(Math.random() * dailyChallenges.length)]
+          setDailyChallenge(randomChallenge)
+        } else {
+          setDailyChallenge(null) // No daily challenges available
+        }
+        console.log(response.data)
+      })
+  }, [])
   useEffect(() => {
-    axios.get(` http://localhost:8080/users/username/${user}`).then((response) => {
-      setUserObject(response.data);
-      console.log(response.data)
-    })
-  }, [selectedChallenge]);
+    axios
+      .get(` http://localhost:8080/users/username/${user}`)
+      .then((response) => {
+        setUserObject(response.data)
+        console.log(response.data)
+      })
+  }, [selectedChallenge])
 
-  const [history, setHistory] = useState(true);
-  const [daily, setDaily] = useState(false);
-  const [weekly, setWeekly] = useState(false);
+  const [history, setHistory] = useState(true)
+  const [daily, setDaily] = useState(false)
+  const [weekly, setWeekly] = useState(false)
 
   const [modalVisible, setModalVisible] = useState(false)
-
 
   const handleCompleted = async () => {
     if (selectedChallenge) {
       try {
         // Send the POST request for completing the challenge
         await axios.post(
-            `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/complete`
-        );
-        console.log('Challenge marked as completed');
+          `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/complete`
+        )
+        setChallengeStatus('completed')
+        console.log('Challenge marked as completed')
         // Optionally, handle state updates or UI changes here
       } catch (error) {
-        console.error('Error completing challenge:', error);
+        console.error('Error completing challenge:', error)
         // You can show an error message to the user here
       }
     }
-  };
+  }
 
   const handleMissed = async () => {
     if (selectedChallenge) {
       try {
         // Send the POST request for marking the challenge as missed
         await axios.post(
-            `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/miss`
-        );
-        console.log('Challenge marked as missed');
+          `http://localhost:8080/users/id/${userObject.id}/challenges/${selectedChallenge.id}/miss`
+        )
+        setChallengeStatus('missed')
+        console.log('Challenge marked as missed')
         // Optionally, handle state updates or UI changes here
       } catch (error) {
-        console.error('Error marking challenge as missed:', error);
+        console.error('Error marking challenge as missed:', error)
         // You can show an error message to the user here
       }
     }
-  };
+  }
 
   const openModal = (challenge: IChallenge) => {
     setSelectedChallenge(challenge)
@@ -129,55 +137,62 @@ export default function HomeScreen() {
   }
 
   const renderChallengeCard = ({ item }: { item: IChallenge }) => (
-    <TouchableOpacity style={styles.card} onPress={() => openModal(item)} key={item.id}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={() => openModal(item)}
+      key={item.id}
+    >
       <View style={styles.card}>
         <View style={styles.cardContent}>
           <Text style={styles.description}>
             {item.description}
             <View style={styles.iconContainer}>
               {item.status === 'completed' && (
-                  <Ionicons name='checkmark-circle' size={30} color='green' />
+                <Ionicons name='checkmark-circle' size={30} color='green' />
               )}
               {item.status === 'missed' && (
-                  <Ionicons name='close-circle' size={30} color='red' />
+                <Ionicons name='close-circle' size={30} color='red' />
               )}
             </View>
           </Text>
-          <Text style={styles.status}>
-            Challenge {item.status}
-          </Text>
+          <Text style={styles.status}>Challenge {item.status}</Text>
         </View>
       </View>
     </TouchableOpacity>
   )
 
-
-
   return (
     <View style={styles.container}>
       <View style={styles.blueContainer}></View>
 
-      <View style={styles.cardDaily}>
+      <View
+        style={[
+          styles.cardDaily,
+          dailyChallenge?.status === 'completed'
+            ? { backgroundColor: '#90EE90' }
+            : dailyChallenge?.status === 'missed'
+            ? { backgroundColor: '#FF0000' }
+            : {}, //default state(color)
+        ]}
+      >
         <Text style={styles.cardTopText}>Challenge of the day</Text>
-        <TouchableOpacity
-        onPress={() => openModal(dailyChallenge)}
-        >
-        {dailyChallenge ? (
-            <Text style={styles.cardBottomText}>{dailyChallenge.description}</Text>
-        ) : (
-            <Text style={styles.cardBottomText}>No daily challenges available!</Text>
-        )}
+        <TouchableOpacity onPress={() => openModal(dailyChallenge)}>
+          {dailyChallenge ? (
+            <Text style={styles.cardBottomText}>
+              {dailyChallenge.description}
+            </Text>
+          ) : (
+            <Text style={styles.cardBottomText}>
+              No daily challenges available!
+            </Text>
+          )}
         </TouchableOpacity>
       </View>
-
 
       <View style={styles.content}>
         <View style={styles.buttons}>
           <TouchableOpacity
-            style={[
-              styles.button,
-              history && styles.selectedButton,
-            ]}
+            style={[styles.button, history && styles.selectedButton]}
             onPress={() => {
               setHistory(true)
               setDaily(false)
@@ -185,20 +200,14 @@ export default function HomeScreen() {
             }}
           >
             <Text
-              style={[
-                styles.buttonText,
-                history && styles.selectedButtonText,
-              ]}
+              style={[styles.buttonText, history && styles.selectedButtonText]}
             >
               History
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.button,
-              daily && styles.selectedButton,
-            ]}
+            style={[styles.button, daily && styles.selectedButton]}
             onPress={() => {
               setHistory(false)
               setDaily(true)
@@ -206,20 +215,14 @@ export default function HomeScreen() {
             }}
           >
             <Text
-              style={[
-                styles.buttonText,
-                daily && styles.selectedButtonText,
-              ]}
+              style={[styles.buttonText, daily && styles.selectedButtonText]}
             >
               Daily
             </Text>
           </TouchableOpacity>
 
           <TouchableOpacity
-            style={[
-              styles.button,
-              weekly && styles.selectedButton,
-            ]}
+            style={[styles.button, weekly && styles.selectedButton]}
             onPress={() => {
               setHistory(false)
               setDaily(false)
@@ -227,10 +230,7 @@ export default function HomeScreen() {
             }}
           >
             <Text
-              style={[
-                styles.buttonText,
-                weekly && styles.selectedButtonText,
-              ]}
+              style={[styles.buttonText, weekly && styles.selectedButtonText]}
             >
               Weekly
             </Text>
@@ -239,45 +239,50 @@ export default function HomeScreen() {
 
         {/* List of Challenge Cards */}
         {history ? (
-            <ScrollView style={styles.challengeList}>
-              {userObject.completedChallenges?.length > 0 ? (
-                  userObject.completedChallenges.map((item) =>
-                      renderChallengeCard({ item })
-                  )
-              ) : (
-                  <Text>No completed challenges found.</Text>
-              )}
-              {userObject.missedChallenges?.length > 0 ? (
-                  userObject.missedChallenges.map((item) =>
-                      renderChallengeCard({ item })
-                  )
-              ) : <Text>No missed challenges</Text>}
-            </ScrollView>
+          <ScrollView style={styles.challengeList}>
+            {userObject.completedChallenges?.length > 0 ? (
+              userObject.completedChallenges.map((item) =>
+                renderChallengeCard({ item })
+              )
+            ) : (
+              <Text>No completed challenges found.</Text>
+            )}
+            {userObject.missedChallenges?.length > 0 ? (
+              userObject.missedChallenges.map((item) =>
+                renderChallengeCard({ item })
+              )
+            ) : (
+              <Text>No missed challenges</Text>
+            )}
+          </ScrollView>
         ) : null}
         {daily ? (
-            <ScrollView style={styles.challengeList}>
-              {userObject.inProgressChallenges.filter(challenge => challenge.type === 'daily').length > 0 ? (
-                  userObject.inProgressChallenges
-                      .filter(challenge => challenge.type === 'daily')
-                      .map(item => renderChallengeCard({ item }))
-              ) : (
-                  <Text>No daily in-progress challenges found.</Text>
-              )}
-            </ScrollView>
+          <ScrollView style={styles.challengeList}>
+            {userObject.inProgressChallenges.filter(
+              (challenge) => challenge.type === 'daily'
+            ).length > 0 ? (
+              userObject.inProgressChallenges
+                .filter((challenge) => challenge.type === 'daily')
+                .map((item) => renderChallengeCard({ item }))
+            ) : (
+              <Text>No daily in-progress challenges found.</Text>
+            )}
+          </ScrollView>
         ) : null}
 
         {weekly ? (
-            <ScrollView style={styles.challengeList}>
-              {userObject.inProgressChallenges.filter(challenge => challenge.type === 'weekly').length > 0 ? (
-                  userObject.inProgressChallenges
-                      .filter(challenge => challenge.type === 'weekly')
-                      .map(item => renderChallengeCard({ item }))
-              ) : (
-                  <Text>No weekly in-progress challenges found.</Text>
-              )}
-            </ScrollView>
+          <ScrollView style={styles.challengeList}>
+            {userObject.inProgressChallenges.filter(
+              (challenge) => challenge.type === 'weekly'
+            ).length > 0 ? (
+              userObject.inProgressChallenges
+                .filter((challenge) => challenge.type === 'weekly')
+                .map((item) => renderChallengeCard({ item }))
+            ) : (
+              <Text>No weekly in-progress challenges found.</Text>
+            )}
+          </ScrollView>
         ) : null}
-
       </View>
       {/* Modal for challenge description */}
       <Modal
@@ -325,7 +330,6 @@ export default function HomeScreen() {
       </Modal>
     </View>
   )
-
 }
 
 const styles = StyleSheet.create({
@@ -340,7 +344,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   cardDaily: {
-    backgroundColor: '#F7A348',
+    //backgroundColor: '#F7A348',
     padding: 30,
     borderRadius: 20,
     width: '80%',
@@ -391,6 +395,7 @@ const styles = StyleSheet.create({
     color: '#000', // Black text for unselected buttons
     fontSize: 15,
     fontWeight: 'semibold',
+    fontFamily: 'Sora',
   },
   selectedButton: {
     backgroundColor: '#F7A348', // Orange when selected
@@ -415,12 +420,14 @@ const styles = StyleSheet.create({
   description: {
     fontSize: 18,
     fontWeight: 'bold',
+    fontFamily: 'Sora',
     flexWrap: 'wrap',
   },
   status: {
     fontSize: 14,
+    fontFamily: 'Sora',
     color: '#999',
-    top: 5
+    top: 5,
   },
   iconContainer: {
     marginLeft: 10,
@@ -447,10 +454,12 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 20,
     fontWeight: 'bold',
+    fontFamily: 'Sora',
     marginBottom: 10,
   },
   modalDescription: {
     fontSize: 16,
+    fontFamily: 'Sora',
     marginBottom: 20,
   },
   buttonsRow: {
@@ -469,6 +478,7 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Sora',
   },
   missedButton: {
     backgroundColor: '#00008B',
@@ -481,5 +491,6 @@ const styles = StyleSheet.create({
     color: '#FFF',
     fontWeight: 'bold',
     fontSize: 16,
+    fontFamily: 'Sora',
   },
 })
