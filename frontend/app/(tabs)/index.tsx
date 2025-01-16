@@ -51,7 +51,7 @@ export default function HomeScreen() {
   // Redirect to login if the user is not authenticated
   useEffect(() => {
     if (!user) {
-      router.replace('http://localhost:8081/login_page'); // Adjust the route if needed
+      router.replace('http://localhost:8081/login'); // Adjust the route if needed
     }
   }, [user]);
 
